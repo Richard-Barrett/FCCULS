@@ -5,20 +5,31 @@ LABEL Description="Cutting-edge LAMP stack, based on Ubuntu 18.04 LTS. Includes 
 	Version="1.0"
 
 # Update & Upgrade Pacages
-RUN apt-get update -y
+RUN apt-get update
 RUN apt-get upgrade -y
 
+# Make Parent Directories and Application 
+#RUN mkdir -p /opt/FCCULS/app \
+#    mkdir -p /opt/FCCULS/jobs \
+#    mkdir -p /opt/FCCULS/python/ \
+#    mkdir -p /tmp/ \
+#    mkdir -p /app/
+
 # Copy Application Directories
-COPY /app/ /opt/FCCULS/app/
-COPY debconf.selections /tmp/
-COPY /python/requirements.txt /opt/FCCULS/python/requirements.txt
-COPY /jobs/ /opt/FCCULS/jobs/
+ADD app/ /opt/FCCULS/app
+ADD debconf.selections /tmp
+ADD python/requirements.txt /opt/FCCULS/python/requirements.txt
+ADD jobs/ /opt/FCCULS/jobs
 
 # Install Python3
-RUN apt-get install -y software-properties-common \
-    add-apt-repository ppa:deadsnakes/ppa \
-    apt-get install -y python3.9 \
-    apt-get install -y python3-pip
+RUN apt-get install -y \
+    software-properties-common
+    
+RUN add-apt-repository ppa:deadsnakes/ppa
+
+RUN apt-get install -y \
+    python3.9 \
+    python3-pip
 
 # Install Pip3
 RUN pip3 install -r /opt/FCCULS/python/requirements.txt
@@ -60,7 +71,7 @@ RUN apt-get install -y \
 	php7.0-xmlrpc \
 	php7.0-xsl \
 	php7.0-zip
-    
+
 RUN apt-get install apache2 libapache2-mod-php7.0 -y
 RUN apt-get install mariadb-common mariadb-server mariadb-client -y
 RUN apt-get install postfix -y
